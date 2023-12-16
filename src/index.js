@@ -1,10 +1,15 @@
 import { imagesSearch } from './images-api.js';
 import Notiflix from 'notiflix';
+// Opisany w dokumentacji
+import SimpleLightbox from 'simplelightbox';
+// Dodatkowy import stylów
+import 'simplelightbox/dist/simple-lightbox.min.css';
 
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('search-form');
   const gallery = document.querySelector('.gallery');
   const loadMoreBtn = document.querySelector('.load-more');
+  const lightbox = new SimpleLightbox('.gallery a');
 
   let page = 1;
   let searchQuery = '';
@@ -24,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const response = await imagesSearch(searchQuery, page);
       handleImageResponse(response);
+      lightbox.refresh();
     } catch (error) {
       console.error('Error fetching images:', error);
     }
@@ -49,16 +55,24 @@ document.addEventListener('DOMContentLoaded', () => {
       gallery.appendChild(card);
     });
 
-    if (data.totalHits <= page * 20) {
-      loadMoreBtn.style.display = 'block';
-    } else {
+    if (response.totalHits <= page * 20) {
       loadMoreBtn.style.display = 'none';
+      if (page > 1) {
+        Notiflix.Notify.info(
+          "We're sorry, but you've reached the end of search results."
+        );
+      }
+    } else {
+      loadMoreBtn.style.display = 'block';
     }
   }
 
   function createImageCard(imageData) {
     const card = document.createElement('div');
     card.classList.add('photo-card');
+
+    const anchor = document.createElement('a');
+    anchor.href = imageData.largeImageURL;
 
     const image = document.createElement('img');
     image.src = imageData.webformatURL;
@@ -88,7 +102,8 @@ document.addEventListener('DOMContentLoaded', () => {
     info.appendChild(comments);
     info.appendChild(downloads);
 
-    card.appendChild(image);
+    anchor.appendChild(image);
+    card.appendChild(anchor);
     card.appendChild(info);
 
     console.log(card);
@@ -102,6 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const response = await imagesSearch(searchQuery, page);
       handleImageResponse(response);
+      lightbox.refresh();
     } catch (error) {
       console.error('Error fetching more images:', error);
     }
