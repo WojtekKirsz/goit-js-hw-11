@@ -43,9 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
       !Array.isArray(response.hits) ||
       response.hits.length === 0
     ) {
-      Notiflix.Notify.failure(
-        'Oops! Something went wrong! Try reloading the page!'
-      );
       console.log('Invalid or empty response data');
       return;
     }
@@ -55,7 +52,10 @@ document.addEventListener('DOMContentLoaded', () => {
       gallery.appendChild(card);
     });
 
-    if (response.totalHits <= page * 20) {
+    const totalImagesLoaded = page * 10;
+    const totalHits = response.totalHits;
+
+    if (totalImagesLoaded >= totalHits) {
       loadMoreBtn.style.display = 'none';
       if (page > 1) {
         Notiflix.Notify.info(
@@ -118,6 +118,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const response = await imagesSearch(searchQuery, page);
       handleImageResponse(response);
       lightbox.refresh();
+      const totalImagesLoaded = page * 10;
+      const totalHits = response.totalHits;
+      if (totalImagesLoaded >= totalHits) {
+        loadMoreBtn.style.display = 'none';
+        if (page > 1) {
+          Notiflix.Notify.info(
+            "We're sorry, but you've reached the end of search results."
+          );
+        }
+      } else {
+        loadMoreBtn.style.display = 'block';
+      }
     } catch (error) {
       console.error('Error fetching more images:', error);
     }

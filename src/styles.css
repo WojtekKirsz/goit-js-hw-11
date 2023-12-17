@@ -24,6 +24,15 @@ button[type='submit'] {
   cursor: pointer;
 }
 
+button[type='button'] {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  background-color: red;
+  color: white;
+  cursor: pointer;
+}
+
 .gallery {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -53,11 +62,15 @@ button[type='submit'] {
   font-weight: bold;
   font-size: 15px;
   text-align: center;
-
   width: 80px;
   flex: 1;
+  display: grid;
 }
 
-/* .load-more {
+.load-more {
   display: none;
-} */
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  width: 100%;
+}
