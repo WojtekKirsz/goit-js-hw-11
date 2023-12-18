@@ -44,20 +44,28 @@ document.addEventListener('DOMContentLoaded', () => {
       response.hits.length === 0
     ) {
       console.log('Invalid or empty response data');
+      Notiflix.Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
       return;
     }
-
+    const totalHits = response.totalHits;
+    Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
     response.hits.forEach(imageData => {
       const card = createImageCard(imageData);
       gallery.appendChild(card);
     });
 
-    const totalImagesLoaded = page * 10;
-    const totalHits = response.totalHits;
+    // const totalImagesLoaded = page * 10;
+    // const totalHits = response.totalHits;
+    const totalImagesLoaded = response.hits.length;
+
+    console.log(totalImagesLoaded);
+    console.log(totalHits);
 
     if (totalImagesLoaded >= totalHits) {
       loadMoreBtn.style.display = 'none';
-      if (page > 1) {
+      if (page >= 1) {
         Notiflix.Notify.info(
           "We're sorry, but you've reached the end of search results."
         );
