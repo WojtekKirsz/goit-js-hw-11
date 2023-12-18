@@ -28,6 +28,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       const response = await imagesSearch(searchQuery, page);
+      if (
+        !response ||
+        !response.hits ||
+        !Array.isArray(response.hits) ||
+        response.hits.length === 0
+      ) {
+        console.log('Invalid or empty response data');
+        Notiflix.Notify.failure(
+          'Sorry, there are no images matching your search query. Please try again.'
+        );
+        return;
+      }
+      const totalHits = response.totalHits;
+      Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+      if (page * 40 >= totalHits) {
+        loadMoreBtn.style.display = 'none';
+
+        Notiflix.Notify.info(
+          "We're sorry, but you've reached the end of search results."
+        );
+      } else {
+        loadMoreBtn.style.display = 'block';
+      }
       handleImageResponse(response);
       lightbox.refresh();
     } catch (error) {
@@ -37,42 +60,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function handleImageResponse(response) {
     const gallery = document.querySelector('.gallery');
-    if (
-      !response ||
-      !response.hits ||
-      !Array.isArray(response.hits) ||
-      response.hits.length === 0
-    ) {
-      console.log('Invalid or empty response data');
-      Notiflix.Notify.failure(
-        'Sorry, there are no images matching your search query. Please try again.'
-      );
-      return;
-    }
-    const totalHits = response.totalHits;
-    Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+
     response.hits.forEach(imageData => {
       const card = createImageCard(imageData);
       gallery.appendChild(card);
     });
-
-    // const totalImagesLoaded = page * 10;
-    // const totalHits = response.totalHits;
-    const totalImagesLoaded = response.hits.length;
-
-    console.log(totalImagesLoaded);
-    console.log(totalHits);
-
-    if (totalImagesLoaded >= totalHits) {
-      loadMoreBtn.style.display = 'none';
-      if (page >= 1) {
-        Notiflix.Notify.info(
-          "We're sorry, but you've reached the end of search results."
-        );
-      }
-    } else {
-      loadMoreBtn.style.display = 'block';
-    }
   }
 
   function createImageCard(imageData) {
@@ -124,20 +116,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       const response = await imagesSearch(searchQuery, page);
-      handleImageResponse(response);
-      lightbox.refresh();
-      const totalImagesLoaded = page * 10;
+
       const totalHits = response.totalHits;
-      if (totalImagesLoaded >= totalHits) {
+      if (page * 40 >= totalHits) {
         loadMoreBtn.style.display = 'none';
-        if (page > 1) {
-          Notiflix.Notify.info(
-            "We're sorry, but you've reached the end of search results."
-          );
-        }
+        Notiflix.Notify.info(
+          "We're sorry, but you've reached the end of search results."
+        );
       } else {
         loadMoreBtn.style.display = 'block';
       }
+      handleImageResponse(response);
+      lightbox.refresh();
     } catch (error) {
       console.error('Error fetching more images:', error);
     }
